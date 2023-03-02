@@ -1,0 +1,11 @@
+.static {
+  font-size: 2rem;
+  padding: 1rem;
+  background-color: coral;
+}
+
+.section {
+  height: 100vh;
+  padding: 1rem;
+  background-color: darkgrey;
+}
