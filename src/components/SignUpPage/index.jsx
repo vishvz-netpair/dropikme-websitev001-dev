@@ -1,23 +1,22 @@
 import React, { useEffect, useState } from "react";
+import "./style.scss";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import Select from "@material-ui/core/Select";
 import Button from "@material-ui/core/Button";
 import { useLocation, useNavigate } from "react-router-dom";
 import * as Yup from "yup";
-import "./style.scss";
 import { InputLabel, MenuItem } from "@material-ui/core";
 import { useFormik } from "formik";
 import AI from "../../axiosInstance";
+import { toast } from "react-toastify";
 
 const SignUpPage = (props) => {
   const nav = useNavigate();
   const { state } = useLocation();
   const { planId, amount, discount } = state;
-  const [resStatus, setResStatus] = useState();
-  const [businessType, setBusinessType] = useState("xx");
+  const [business, setBusiness] = useState("");
   const [fetchData, setFetchData] = useState();
-  const [isValid, setIsValid] = useState(false);
 
   const fetchBusinessTypes = async () => {
     try {
@@ -34,27 +33,26 @@ const SignUpPage = (props) => {
 
   const formik = useFormik({
     initialValues: {
-      email: "",
       name: "",
+      email: "",
       contactNo: "",
+      businessType: "",
     },
+    validateOnMount: true,
     validationSchema: Yup.object().shape({
-      email: Yup.string().min(5, "Too Short!").email().required("Required"),
-      name: Yup.string()
-        .min(2, "Too Short!")
-        .max(50, "Too Long!")
-        .required("Required"),
+      name: Yup.string().max(50, "Too Long!").required("Name is required"),
+      email: Yup.string().email().required("Email is required"),
       contactNo: Yup.string()
-        .min(7, "Too Short!")
         .max(50, "Too Long!")
-        .required("Required"),
+        .required("Contact number is required"),
+      businessType: Yup.string().required("Business type is required"),
     }),
     onSubmit: async ({ name, contactNo, email }) => {
       const formData = {
-        email,
         name,
+        email,
         contactNo,
-        businessType,
+        businessType: business,
         companyName: "",
         address: "",
         postCode: "",
@@ -63,15 +61,14 @@ const SignUpPage = (props) => {
         details: "",
         roleCode: "ORG",
       };
-      validateDropDown();
-      console.log(formData);
+      // validateDropDown(business);
       await AI.post(`/master/organizationSignup?planId=${planId}`, formData)
         .then((res) => {
           if (res.status === 200) {
-            setResStatus(res.status);
+            toast.warn("Username already exists in our app");
           }
           if (res.status === 201) {
-            setResStatus(201);
+            toast.success("Sign up successful");
             nav("/payment", {
               state: {
                 organizerId: res.data?.organization?._id,
@@ -84,27 +81,16 @@ const SignUpPage = (props) => {
           }
         })
         .catch((err) => {
-          setResStatus(500);
+          toast.error("Sign up failed");
         });
     },
   });
 
   const { values, handleBlur, handleChange, handleSubmit, errors } = formik;
 
-  const validateDropDown = (value) => {
-    if (businessType === "" || businessType === undefined) {
-      setIsValid(false);
-    } else {
-      setIsValid(true);
-    }
-  };
-
   return (
     <Grid className="loginWrapper">
       <Grid className="loginForm">
-        {resStatus === 200 && <div>Username already exists in our app</div>}
-        {resStatus === 500 && <div>Server Error</div>}
-
         <h2>Signup</h2>
         <p>Signup your account</p>
         <form onSubmit={handleSubmit}>
@@ -124,7 +110,6 @@ const SignUpPage = (props) => {
                 onBlur={(e) => handleBlur(e)}
                 onChange={(e) => handleChange(e)}
               />
-              {errors.name && <span>{errors.name}</span>}
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -141,7 +126,6 @@ const SignUpPage = (props) => {
                 onBlur={(e) => handleBlur(e)}
                 onChange={(e) => handleChange(e)}
               />
-              {errors.email && <span>{errors.email}</span>}
             </Grid>
             <Grid item xs={12}>
               <TextField
@@ -158,7 +142,6 @@ const SignUpPage = (props) => {
                 onBlur={(e) => handleBlur(e)}
                 onChange={(e) => handleChange(e)}
               />
-              {errors.contactNo && <span>{errors.contactNo}</span>}
             </Grid>
 
             <Grid item xs={12}>
@@ -173,16 +156,18 @@ const SignUpPage = (props) => {
                 onBlur={(e) => handleBlur(e)}
                 onChange={(e) => {
                   handleChange(e);
-                  setBusinessType(e.target.value);
-                  validateDropDown(e.target.value);
+                  setBusiness(e.target.value);
                 }}
               >
                 <MenuItem>Select Business Type</MenuItem>
                 {fetchData?.map((item) => {
-                  return <MenuItem value={item?._id}>{item?.name}</MenuItem>;
+                  return (
+                    <MenuItem key={item?._id} value={item?._id}>
+                      {item?.name}
+                    </MenuItem>
+                  );
                 })}
               </Select>
-              {!isValid && <span>Please select Business Type</span>}
             </Grid>
             <Grid item xs={12}>
               <Grid className="formFooter">
@@ -190,6 +175,13 @@ const SignUpPage = (props) => {
                   fullWidth
                   className="cBtn cBtnLarge cBtnTheme"
                   type="submit"
+                  onClick={() => {
+                    if (Object.keys(errors).length === 0) {
+                      return null;
+                    } else {
+                      toast.warn(errors[Object.keys(errors)[0]]);
+                    }
+                  }}
                 >
                   Sign Up
                 </Button>

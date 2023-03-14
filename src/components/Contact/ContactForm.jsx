@@ -3,40 +3,34 @@ import React from "react";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import AI from "../../axiosInstance";
-const Contact = () => {
-  toast.configure();
+
+const ContactForm = () => {
   const formik = useFormik({
     initialValues: {
       name: "",
       email: "",
       contactNo: "",
-      details: "",
-      demoDate: "",
-      Time: "",
+      message: "",
     },
     validateOnMount: true,
-
     validationSchema: Yup.object().shape({
       name: Yup.string().required("Name is required"),
       email: Yup.string().email().required("Email is required"),
       contactNo: Yup.string(),
-      details: Yup.string(),
-      demoDate: Yup.string().required(),
-      Time: Yup.string().required(),
+      message: Yup.string(),
     }),
-    onSubmit: async ({ name, email, contactNo, details, demoDate, Time }) => {
+    onSubmit: async ({ name, email, contactNo, message, demoDate, Time }) => {
       try {
         const formData = {
-          name: name,
-          email: email,
-          contactNo: contactNo,
-          details: details,
-          demoDate: demoDate,
-          Time: Time,
+          name,
+          email,
+          contactNo,
+          message,
         };
 
-        await AI.post("/admin/addAdminRequest", formData);
+        await AI.post("/admin/addContactForm", formData);
         toast.success("Successful!");
+        resetForm();
       } catch (error) {
         console.log(error);
         toast.error("Response not submitted");
@@ -44,96 +38,80 @@ const Contact = () => {
     },
   });
 
-  const { values, handleChange, handleBlur, handleSubmit, errors } = formik;
+  const { values, handleChange, handleBlur, handleSubmit, errors, resetForm } =
+    formik;
   return (
     <form onSubmit={handleSubmit} className="contact-validation-active">
       <div className="row">
-        <div className="col col-lg-6 col-md-6 col-12">
+        <div className="col col-lg-6 col-12">
           <div className="form-field">
             <input
               className="form-control"
               value={values.name}
               type="text"
               name="name"
-              onChange={(e) => handleChange(e)}
               onBlur={(e) => handleBlur(e)}
+              onChange={(e) => handleChange(e)}
               placeholder="Your Name"
             />
           </div>
         </div>
-        <div className="col col-lg-6 col-md-6 col-12">
+        <div className="col col-lg-6 col-12">
           <div className="form-field">
             <input
               className="form-control"
               value={values.email}
               type="email"
               name="email"
-              onChange={(e) => handleChange(e)}
               onBlur={(e) => handleBlur(e)}
+              onChange={(e) => handleChange(e)}
               placeholder="Your Email"
             />
           </div>
         </div>
-        <div className="col col-lg-12 col-12">
+        <div className="col col-lg-6 col-12">
           <div className="form-field">
             <input
               className="form-control"
-              onChange={(e) => handleChange(e)}
-              onBlur={(e) => handleBlur(e)}
               value={values.contactNo}
-              type="text"
+              type="phone"
               name="contactNo"
-              placeholder="Contact Number"
-            ></input>
+              onBlur={(e) => handleBlur(e)}
+              onChange={(e) => handleChange(e)}
+              placeholder="Your contact number"
+            />
           </div>
         </div>
-
-        <div className="col fullwidth col-lg-12">
+        {/* <div className="col col-lg-6 col-12">
+                    <div className="form-field">
+                        <select
+                            onBlur={(e) => handleBlur(e)}
+                            onChange={(e) => handleChange(e)}
+                            value={values.subject}
+                            type="text"
+                            name="subject">
+                            <option>Choose a Service</option>
+                            <option>Tax Management</option>
+                            <option>Financial Advices</option>
+                            <option>Risk Management</option>
+                        </select>
+                    </div>
+                </div> */}
+        <div className="col col-lg-12 col-12">
           <textarea
             className="form-control"
-            onChange={(e) => handleChange(e)}
             onBlur={(e) => handleBlur(e)}
-            value={values.details}
+            onChange={(e) => handleChange(e)}
+            value={values.message}
             type="text"
-            name="details"
-            placeholder="details"
+            name="message"
+            placeholder="Message"
           ></textarea>
-        </div>
-
-        <div className="col col-lg-12 col-12">
-          <div className="form-field">
-            <input
-              className="form-control"
-              id="demoDate"
-              name="demoDate"
-              type="text"
-              onChange={(e) => handleChange(e)}
-              onBlur={(e) => handleBlur(e)}
-              value={values.demoDate}
-              placeholder="Please enter Date"
-              onFocus={(e) => (e.target.type = "date")}
-            />
-          </div>
-        </div>
-        <div className="col col-lg-12 col-12">
-          <div className="form-field">
-            <input
-              className="form-control"
-              id="Time"
-              name="Time"
-              type="text"
-              onChange={handleChange}
-              value={values.Time}
-              placeholder="Time"
-              onFocus={(e) => (e.target.type = "time")}
-            />
-          </div>
         </div>
       </div>
       <div className="submit-area">
         <button
           type="submit"
-          className="theme-btn"
           onClick={() => {
             if (Object.keys(errors).length === 0) {
               return null;
@@ -141,6 +119,7 @@ const Contact = () => {
               toast.warn(errors[Object.keys(errors)[0]]);
             }
           }}
+          className="theme-btn"
         >
           Submit Now
         </button>
@@ -149,4 +128,4 @@ const Contact = () => {
   );
 };
 
-export default Contact;
+export default ContactForm;

@@ -6,6 +6,8 @@ import SignUpPage from "../components/SignUpPage";
 import PageTitle from "../components/pagetitle/PageTitle";
 import Confirmation from "../components/Confirmation";
 import Payment from "../components/Payment";
+import Contact from "../components/Contact";
+import AboutPage from "../components/AboutPage";
 
 const AppRoutes = () => {
   return (
@@ -29,6 +31,10 @@ const AppRoutes = () => {
       />
       <Route path="" element={<Layout />}>
         <Route index element={<HomePage />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/features" element={<div>Features</div>} />
+        <Route path="/plan" element={<div>Planss</div>} />
       </Route>
     </Routes>
   );

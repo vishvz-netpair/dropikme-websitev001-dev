@@ -1,13 +1,9 @@
 import React from "react";
 import Contact from "./contact";
 import Services from "../../api/service";
-import { Link } from "react-router-dom";
+import "./style.css";
 
 const TalkToExpert = () => {
-  const ClickHandler = () => {
-    window.scrollTo(10, 0);
-  };
-
   return (
     <>
       <div className="container section-padding">
@@ -19,7 +15,7 @@ const TalkToExpert = () => {
                   <div className="wpo-service-single-item">
                     <div className="wpo-service-contact-area">
                       <div className="wpo-contact-title">
-                        <h2>Have project in mind? Let's discuss</h2>
+                        <h2>Request for Demo</h2>
                         <p>
                           Get in touch with us to see how we can help you with
                           your project
@@ -36,17 +32,20 @@ const TalkToExpert = () => {
           </div>
           <div className="blog-sidebar col col-12 col-lg-6">
             <div className="widget category-widget">
-              <h3>Post Categories</h3>
-              <ul>
+              <h3>FAQs</h3>
+              <ul className="accordion-wrap">
                 {Services.slice(0, 6).map((service, Sitem) => (
-                  <li key={Sitem}>
-                    <Link
-                      onClick={ClickHandler}
-                      to={`/service-single/${service.Id}`}
-                    >
-                      {service.sTitle}
-                    </Link>
-                  </li>
+                  <details key={Sitem} className="accordion-item">
+                    <summary>
+                      <h6>{service.sTitle}</h6>
+                    </summary>
+                    <p>
+                      Lorem ipsum dolor, sit amet consectetur adipisicing elit.
+                      Facilis possimus rerum magni velit aliquid quod laboriosam
+                      excepturi dolores nisi, quisquam, porro minus eum ad
+                      tenetur necessitatibus cumque tempora! Beatae, corrupti.
+                    </p>
+                  </details>
                 ))}
               </ul>
             </div>
